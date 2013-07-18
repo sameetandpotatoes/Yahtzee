@@ -1,40 +1,55 @@
 import random
-
 scoreOfPlayer = 0
 def roll():
     firstroll = rolldie(5)
-    print("Your first roll was:", firstroll)
-    result = input("Are you going to keep all or keep some? (k or r)")
-
+    print("Your first roll was:", firstroll, "\n")
+    result = input("Are you going to keep all or keep some? (k or r) ")
+    result = (result.lower()).strip()
     firsttime = 1
     keeping = []
     finalroll = []
     indexesused = []
     times = 0
-
+    brokerule = False
+    
     if result == "r":
         for times in range(2):
             if firsttime == 1:
                 finalroll = firstroll
             else:
                 print("Your current dice are:", finalroll)
-                keepreplacing = input("Do you want to keep these dice (y or n)")
-                if keepreplacing == "y":
+                result = input("Do you want to keep these dice (y or n)? ")
+                result = (result.lower()).strip()
+                if result == "y":
                     break;
+                elif result != "n":
+                    print("I'll take that as a no.\n")
             index = 0
             while True:
-                index = input("Type which one in the array of what you want to keep one at a time (q to stop)")
-                if index == "q" or index == "Q":
+                index = input("Type which one in the array of what you want to keep one at a time (q to stop) ")
+                index = (index.lower()).strip()
+                if index == "q":
                     break;  
-                index = int(index) 
-                while index in indexesused:                
-                    index = input("Try another index. You are already replacing", finalroll[index - 1])
+                try:
                     index = int(index)
-                onetokeep = finalroll[index - 1]
-                keeping.append(onetokeep)
-                indexesused.append(index)
-                print(onetokeep, "was stored.")
-            print("Keeping", keeping, "and rolling the others ...")
+                    while index in indexesused:                
+                        print("Sorry, you are already replacing", finalroll[index - 1], ".\n")
+                        index = input("Try another index. ")
+                        index = int(index)   
+                    onetokeep = finalroll[index - 1]
+                    keeping.append(onetokeep)
+                    indexesused.append(index)
+                    print("You are keeping " + str(onetokeep) + "\n")
+                except IndexError:
+                    print("\nYou only have 5 dice!\n")
+                    continue
+                except:
+                    print("\nStop trying to break the rules!\n")
+                    continue
+            if len(keeping) == 0:
+                print("Not keeping anything. Rerolling all dice ...")
+            else:
+                print("Keeping", keeping, "and rolling the others ...")
             newdicearray = rolldie(5-len(keeping))
             for newdice in newdicearray:
                 keeping.append(newdice)
@@ -45,8 +60,8 @@ def roll():
     else:
         finalroll = firstroll
     if times == 2:
-    	print("You have changed dice three times.")
-    print("Your roll was: %s" %(finalroll))
+    	print("You have changed some dice three times.")
+    print("Your roll was: %s\n" %(finalroll))
     return finalroll
 
 def rolldie(numToRoll):
@@ -65,15 +80,19 @@ def countDice(number, dice):
 	return score
 
 def choosePoints(dice):
-    print(allValues)
+    for key, value in allValues.items():
+        key = str(key)
+        value = str(value)
+        print(key + ":\t" + value + " points.")
     global scoreOfPlayer
-    option = input("Here are all of your options to pick from. Choose which one you would like by entering the name of the option.")
+    option = input("\nHere are all of your options to pick from. Choose which one you would like by entering the name of the option.\n")
     for key, value in allValues.items():
         keycopy = (key.strip()).lower()
         option = (key.strip()).lower()
         if keycopy == option:
             scoreOfPlayer = scoreOfPlayer + int(value)
-            print("Player Score: %s" %(scoreOfPlayer))
+            print("Player Score: %s\n" %(scoreOfPlayer))
+            #Still figuring out how to remove an entry in dictionary
             return;
 
 def checkFullHouse(dice):
@@ -108,19 +127,19 @@ def checkStraight(smallOrLarge, dice):
 for turns in range(10):
 	print("Turn %s started.\n" %(turns + 1))
 	dice = roll()
-	allValues = {"Aces" : countDice(1, dice),
-                     "Twos" : countDice(2, dice),
-                     "Three" : countDice(3, dice),
-                     "Four" : countDice(4, dice),
-                     "Five" : countDice(5, dice),
-                     "Six" : countDice(6, dice),
-                     "3 of a kind" : ofAKind(3, dice),
-                     "4 of a kind" : ofAKind(4, dice),
-                     "Full House" : checkFullHouse(dice),
+	allValues = {"Aces          " : countDice(1, dice),
+                     "Twos          " : countDice(2, dice),
+                     "Three         " : countDice(3, dice),
+                     "Four          " : countDice(4, dice),
+                     "Five          " : countDice(5, dice),
+                     "Six           " : countDice(6, dice),
+                     "3 of a kind   " : ofAKind(3, dice),
+                     "4 of a kind   " : ofAKind(4, dice),
+                     "Full House    " : checkFullHouse(dice),
                      "Small Straight" : checkStraight(0, dice),
                      "Large Straight" : checkStraight(1, dice),
-                     "Yahtzee" : ofAKind(5, dice),
-                     "Chance" : sum(dice)}
+                     "Yahtzee       " : ofAKind(5, dice),
+                     "Chance        " : sum(dice)}
 	choosePoints(dice)
 	print("\nTurn", turns + 1, "completed.")
 

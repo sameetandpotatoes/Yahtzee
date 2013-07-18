@@ -1,7 +1,6 @@
 import random
 
 scoreOfPlayer = 0
-
 def roll():
     firstroll = rolldie(5)
     print("Your first roll was:", firstroll)
@@ -66,14 +65,16 @@ def countDice(number, dice):
 	return score
 
 def choosePoints(dice):
-	print(allValues)
-	option = input("Here are all of your options to pick from. Choose which one you would like by entering the name of the option.")
-	for key in allValues.iteritems():
-		keycopy = lower(strip(key))
-		option = lower(strip(option))
-		if keycopy == option:
-			scoreOfPlayer = scoreOfPlayer + int(allValues[key])
-	print("Player Score: %s" %(scoreOfPlayer))
+    print(allValues)
+    global scoreOfPlayer
+    option = input("Here are all of your options to pick from. Choose which one you would like by entering the name of the option.")
+    for key, value in allValues.items():
+        keycopy = (key.strip()).lower()
+        option = (key.strip()).lower()
+        if keycopy == option:
+            scoreOfPlayer = scoreOfPlayer + int(value)
+            print("Player Score: %s" %(scoreOfPlayer))
+            return;
 
 def checkFullHouse(dice):
 	for num in dice:
@@ -91,10 +92,10 @@ def ofAKind(numOfKind, dice):
 			else:
 				return numOfKind * number
 	return 0
-def checkStraight(type, dice):
+def checkStraight(smallOrLarge, dice):
 	sortedArray = list(set(dice))
 	sortedArray.sort(reverse=True)
-	if type == 1: #large
+	if smallOrLarge == 1: #large
 		if sum(sortedArray) == 15:
 			return sum(dice)
 	else: #type = 0, small
@@ -107,7 +108,19 @@ def checkStraight(type, dice):
 for turns in range(10):
 	print("Turn %s started.\n" %(turns + 1))
 	dice = roll()
-	allValues = {"Aces" : countDice(1, dice), "Twos" : countDice(2, dice), "Three" : countDice(3, dice), "Four" : countDice(4, dice), "Five" : countDice(5, dice), "Six" : countDice(6, dice), "3 of a kind" : ofAKind(3, dice), "4 of a kind" : ofAKind(4, dice), "Full House" : checkFullHouse(dice), "Small Straight" : checkStraight(0, dice), "Large Straight" : checkStraight(1, dice), "Yahtzee" : ofAKind(5, dice), "Chance" : sum(dice)}
+	allValues = {"Aces" : countDice(1, dice),
+                     "Twos" : countDice(2, dice),
+                     "Three" : countDice(3, dice),
+                     "Four" : countDice(4, dice),
+                     "Five" : countDice(5, dice),
+                     "Six" : countDice(6, dice),
+                     "3 of a kind" : ofAKind(3, dice),
+                     "4 of a kind" : ofAKind(4, dice),
+                     "Full House" : checkFullHouse(dice),
+                     "Small Straight" : checkStraight(0, dice),
+                     "Large Straight" : checkStraight(1, dice),
+                     "Yahtzee" : ofAKind(5, dice),
+                     "Chance" : sum(dice)}
 	choosePoints(dice)
 	print("\nTurn", turns + 1, "completed.")
 

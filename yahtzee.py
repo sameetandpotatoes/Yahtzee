@@ -1,6 +1,7 @@
 import random #to generate random finalRoll
 import pickle #to save high score
-
+import os #to help clear the screen
+import time
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -24,7 +25,7 @@ allKeysTaken = [] #so players can select an option only once
 def roll():
 	global finalRoll
 	finalRoll = rolldie(5) #for first roll
-	keeping = []
+	replacing = []
 	indexesused = []
 	times = 0
 	print(bcolors.HEADER + "Your first roll was:", finalRoll, "\n")
@@ -41,7 +42,7 @@ def roll():
 	            result = (result.lower()).strip()
 	            if result == "y":
 	            	break;
-	        indexes = input(bcolors.HEADER + "Type the numbers of what you want to keep. (no spaces)" + bcolors.ENDC)
+	        indexes = input(bcolors.HEADER + "Type the ordinal numbers (first would be 1, second would be 2, and so on)\n of what you want to replace. (no spaces)" + bcolors.ENDC)
 	        try:
 	        	indexesList = list(indexes)
 	        	for index in indexesList:
@@ -50,28 +51,35 @@ def roll():
 	        			print(bcolors.FAIL + "Sorry, you are already replacing " + str(finalRoll[index - 1]) + ".\n")
 	        			index = input("Try another index. " + bcolors.ENDC)
 	        			index = int(index)
-	        		keeping.append(finalRoll[index - 1])
+	        		replacing.append(index - 1)
 	        		indexesused.append(index)
 	        except IndexError:
 	            print(bcolors.FAIL + "\nYou only have 5 finalRoll!\n" + bcolors.ENDC)
-	            keeping = []
+	            replacing = []
 	            indexesused = []
 	            continue
 	        except:
 	            print(bcolors.FAIL + "\nYou probably mistyped something. Remember: don't include spaces!\n" + bcolors.ENDC)
-	            keeping = []
+	            replacing = []
 	            indexesused = []
 	            continue
-	        if len(keeping) == 0:
-	            print(bcolors.OKGREEN + "Not keeping anything. Rerolling all dice ..." + bcolors.ENDC)
+	        if len(replacing) == 0:
+	            print(bcolors.OKGREEN + "Not replacing anything. Rerolling all dice ..." + bcolors.ENDC)
 	        else:
-	            print(bcolors.OKBLUE + "Keeping", keeping, "and rolling the others ..." + bcolors.ENDC)
-	        newfinalRollarray = rolldie(5-len(keeping))
+	        	numReplacing =[]
+	        	for index in replacing:
+	        		numReplacing.append(finalRoll[index])
+	        	print(bcolors.OKBLUE + "Replacing", numReplacing , "and rolling the others ..." + bcolors.ENDC)
+	        keeping = []
+	        for index in (set([0,1,2,3,4]) - set(replacing)):
+	        	keeping.append(finalRoll[index])
+	        
+	        newfinalRollarray = rolldie(len(replacing))
 	        for newfinalRoll in newfinalRollarray:
 	            keeping.append(newfinalRoll)
 	        
 	        finalRoll = keeping
-	        keeping = []
+	        replacing = []
 	        indexesused = []
 	        times += 1
 	print(bcolors.OKGREEN + "Your roll was: %s\n" %(finalRoll) + bcolors.ENDC)
@@ -186,6 +194,9 @@ for turns in range(10):
                      "Pass          " : 0}
 	removeTakenOptions()
 	choosePoints()
+	
+	time.sleep(1) #Sleep for one second
+	os.system('cls' if os.name=='nt' else 'clear') #Will work on both Unix and Windows
 	print(bcolors.HEADER + "\nTurn", turns + 1, "completed." + bcolors.ENDC)
 
 print(bcolors.HEADER + "Game Over! Your score was: " + str(scoreOfPlayer) + bcolors.ENDC)

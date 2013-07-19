@@ -3,12 +3,15 @@ scoreOfPlayer = 0
 allKeysTaken = []
 def roll():
     finalroll = rolldie(5)
-    print("Your first roll was:", finalroll, "\n")
-    result = input("Are you going to keep all or replace some? (k or r) ")
-    result = (result.lower()).strip()
     keeping = []
     indexesused = []
     
+    print("Your first roll was:", finalroll, "\n")
+    result = input("Are you going to keep all or replace some? (k or r) ")
+    result = (result.lower()).strip()
+    while result not in ("k", "r"):
+    	result = input("\nYou probably mistyped something. Try again. ")
+    	result = (result.lower().strip())     
     if result == "r":
         for times in range(2):
             if times != 0:
@@ -69,6 +72,7 @@ def choosePoints():
         value = str(value)
         print(key + ":\t" + value + " points.")
     global scoreOfPlayer
+    global allKeysTaken
     option = input("\nHere are all of your options to pick from. Choose which one you would like by entering the name of the option.\n")
     while True:
 	    for key, value in allValues.items():
@@ -106,22 +110,40 @@ def checkStraight(smallOrLarge):
 		if all(x in sortedArray for x in [1,2,3,4]) or all(x in sortedArray for x in [2,3,4,5]) or all(x in sortedArray for x in [3,4,5,6]):
 			return sum(dice)
 	return 0
+
 def removeTakenOptions():
+	keysToPop = []
+	#Gather all zeros first
+	for key, value in allValues.items():
+		value =  int(value)
+		if value == 0 and "Pass" not in key:
+			keysToPop.append(key)
+	#Gather already taken choices
+	global allKeysTaken
 	for key in allKeysTaken:
 		for keys, values in list(allValues.items()):
+			values = int(values)
+			print("or here")
 			if key is keys:
+				keysToPop.append(key)
+	#Remove everything gathered
+	try:
+		for key in keysToPop:
+			if key in allValues.keys():
 				allValues.pop(key)
+	except KeyError:
+		pass
 
 #Main method
 for turns in range(10):
 	print("Turn %s started.\n" %(turns + 1))
 	dice = roll()
-	allValues = {"Aces          " : countDice(1),
+	allValues = {    "Ones          " : countDice(1),
                      "Twos          " : countDice(2),
-                     "Three         " : countDice(3),
-                     "Four          " : countDice(4),
-                     "Five          " : countDice(5),
-                     "Six           " : countDice(6),
+                     "Threes        " : countDice(3),
+                     "Fours         " : countDice(4),
+                     "Fives         " : countDice(5),
+                     "Sixes         " : countDice(6),
                      "3 of a kind   " : ofAKind(3),
                      "4 of a kind   " : ofAKind(4),
                      "Full House    " : checkFullHouse(),

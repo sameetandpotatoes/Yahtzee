@@ -20,7 +20,9 @@ class bcolors:
 
 scoreOfPlayer = 0 #global variable to keep track of score
 finalRoll = []
-allKeysandValues = {} #so players select an option only once
+allKeysandValues = {}
+bonusReceived = False
+yahtzeeOnce = False #so players select an option only once
 #This method rolls finalRoll and keeps track of which finalRoll players want to keep
 def roll():
 	global finalRoll
@@ -42,7 +44,7 @@ def roll():
 	            result = (result.lower()).strip()
 	            if result == "y":
 	            	break;
-	        indexes = input(bcolors.HEADER + "Type the ordinal numbers (first would be 1, second would be 2, and so on)\n of what you want to replace. (no spaces)" + bcolors.ENDC)
+	        indexes = input(bcolors.HEADER + "Type the ordinal numbers (first would be 1, second would be 2, and so on)\nof what you want to replace. (no spaces) " + bcolors.ENDC)
 	        try:
 	        	indexesList = list(indexes)
 	        	for index in indexesList:
@@ -65,6 +67,7 @@ def roll():
 	            continue
 	        if len(replacing) == 0:
 	            print(bcolors.OKGREEN + "Not replacing anything. Keeping all dice ..." + bcolors.ENDC)
+	            break;
 	        else:
 	        	numReplacing =[]
 	        	for index in replacing:
@@ -127,10 +130,15 @@ def checkFullHouse():
 	return 0
 
 def ofAKind(numOfKind):
+	global yahtzeeOnce
 	for number in finalRoll:
 		if finalRoll.count(number) == numOfKind:
 			if numOfKind == 5: #Yahtzee
-				return 50
+				if yahtzeeOnce: #Second Yahtzee
+					return 100;
+				else: #First Yahtzee
+					yahtzeeOnce = True
+					return 50
 			else:
 				return numOfKind * number
 	return 0
@@ -169,31 +177,42 @@ def removeTakenOptions():
 			index -= 1
 
 def over63():
+	global bonusReceived
+	if bonusReceived:
+		return False;
+	global allKeysandValues
 	sumOfFirstSix = 0
-	arrayToCheck = ["Ones", "Twos", "Threes", "Fours", "Fives", "Sixes"]
-	i = 0
-	for key, value in allKeysandValues.items():
-		if key.strip(" ") == arrayToCheck[i]:
-			sumOfFirstSix += int(value)
-			i += 1
-		else:
-			return False
-		if i == len(arrayToCheck):
-			break;
-	return (sumOfFirstSix >= 63)
+	arrayToCheck = ['Ones          ', 'Twos          ', 'Threes        ',
+					 'Fours         ', 'Fives         ', 'Sixes         ']
+	if all(x in list(allKeysandValues.keys()) for x in arrayToCheck):
+		for index in arrayToCheck:
+			sumOfFirstSix += int(allKeysandValues[index])
+	if sumOfFirstSix >= 63:
+		bonusReceived = True
+		return True
+	else:
+		return False
+
 def printCurrentScoreCard(allOptions):
+	global scoreOfPlayer
+	printedBonus = True
 	print(bcolors.HEADER + "Yahtzee Score Card" + bcolors.ENDC)
 	for key in allOptions:
 		if key == "Over 63 = +35 ":
-			print(bcolors.OKBLUE + key + "|\t" + bcolors.ENDC, end = "\n")
+			print(bcolors.OKBLUE + key + "|\t" + bcolors.ENDC, end = "")
 		elif key != "Pass          ":
 			print(bcolors.OKBLUE + key + "|\t" + bcolors.ENDC, end="")
 		for k, v in allKeysandValues.items():
 			if k == key and k != "Pass          ": #already taken
 				print(bcolors.OKGREEN + str(v), end = "")
+			if key == "Over 63 = +35 ":
 				if over63():
 					scoreOfPlayer += 35
+				if bonusReceived and printedBonus:
+					print(bcolors.OKGREEN + "35" + bcolors.ENDC, end = "")
+					printedBonus = False
 		print()
+	print("Current Score: " + str(scoreOfPlayer))
 
 #Where the program starts
 try:
@@ -212,7 +231,7 @@ for turns in range(10):
 					 "3 of a kind   ", "4 of a kind   ", "Full House    ",
 					 "Small Straight", "Large Straight", "Yahtzee       ",
 					 "Chance        ", "Pass          "],
-					[countDice(1), countDice(2), countDice(3),
+					[50, countDice(2), countDice(3),
 					 countDice(4), countDice(5), countDice(6), 0,
 					 ofAKind(3), ofAKind(4), checkFullHouse(),
 					 checkStraight(0), checkStraight(1), ofAKind(5),

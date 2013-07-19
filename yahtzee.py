@@ -1,55 +1,60 @@
-import random
-scoreOfPlayer = 0
-allKeysTaken = []
+import random #to generate random finalRoll
+import pickle #to save high score
+
+scoreOfPlayer = 0 #global variable to keep track of score
+finalRoll = []
+allKeysTaken = [] #so players can select an option only once
+#This method rolls finalRoll and keeps track of which finalRoll players want to keep
 def roll():
-    finalroll = rolldie(5)
-    keeping = []
-    indexesused = []
-    
-    print("Your first roll was:", finalroll, "\n")
-    result = input("Are you going to keep all or replace some? (k or r) ")
-    result = (result.lower()).strip()
-    while result not in ("k", "r"):
-    	result = input("\nYou probably mistyped something. Try again. ")
-    	result = (result.lower().strip())     
-    if result == "r":
-        for times in range(2):
-            if times != 0:
-	            print("Your current dice are:", finalroll)
-	            result = input("Do you want to keep these dice (y or n) (default answer is y)? ")
+	global finalRoll
+	finalRoll = rolldie(5) #for first roll
+	keeping = []
+	indexesused = []
+	times = 0
+	print("Your first roll was:", finalRoll, "\n")
+	result = input("Are you going to keep all or replace some? (k or r) ")
+	result = (result.lower()).strip()
+	while result not in ("k", "r"):
+		result = input("\nYou probably mistyped something. Try again. ")
+		result = (result.lower().strip())     
+	if result == "r":
+	    while times != 2:
+	        if times != 0:
+	            print("Your current dice are:", finalRoll)
+	            result = input("Do you want to keep these dice (y or n) (default answer is n)? ")
 	            result = (result.lower()).strip()
-	            if result != "n":
+	            if result != "y":
 	            	break;
-            indexes = input("Type the numbers of what you want to keep. (no spaces)")
-            try:
-            	indexesList = list(indexes)
-            	for index in indexesList:
-            		index = int(index)
-            		while index in indexesused:
-            			print("Sorry, you are already replacing " + str(finalroll[index - 1]) + ".\n")
-            			index = input("Try another index. ")
-            			index = int(index)
-            		keeping.append(finalroll[index - 1])
-            		indexesused.append(index)
-            except IndexError:
-                print("\nYou only have 5 dice!\n")
-                continue
-            except:
-                print("\nYou probably mistyped something. Remember: don't include spaces!\n")
-                continue
-            if len(keeping) == 0:
-                print("Not keeping anything. Rerolling all dice ...")
-            else:
-                print("Keeping", keeping, "and rolling the others ...")
-            newdicearray = rolldie(5-len(keeping))
-            for newdice in newdicearray:
-                keeping.append(newdice)
-            
-            finalroll = keeping
-            keeping = []
-            indexesused = []
-    print("Your roll was: %s\n" %(finalroll))
-    return finalroll
+	        indexes = input("Type the numbers of what you want to keep. (no spaces)")
+	        try:
+	        	indexesList = list(indexes)
+	        	for index in indexesList:
+	        		index = int(index)
+	        		while index in indexesused:
+	        			print("Sorry, you are already replacing " + str(finalRoll[index - 1]) + ".\n")
+	        			index = input("Try another index. ")
+	        			index = int(index)
+	        		keeping.append(finalRoll[index - 1])
+	        		indexesused.append(index)
+	        except IndexError:
+	            print("\nYou only have 5 finalRoll!\n")
+	            continue
+	        except:
+	            print("\nYou probably mistyped something. Remember: don't include spaces!\n")
+	            continue
+	        if len(keeping) == 0:
+	            print("Not keeping anything. Rerolling all dice ...")
+	        else:
+	            print("Keeping", keeping, "and rolling the others ...")
+	        newfinalRollarray = rolldie(5-len(keeping))
+	        for newfinalRoll in newfinalRollarray:
+	            keeping.append(newfinalRoll)
+	        
+	        finalRoll = keeping
+	        keeping = []
+	        indexesused = []
+	        times += 1
+	print("Your roll was: %s\n" %(finalRoll))
 
 def rolldie(numToRoll):
     diechoices = ['1', '2', '3', '4', '5', '6']
@@ -60,7 +65,7 @@ def rolldie(numToRoll):
 
 def countDice(number):
 	counter = 0
-	for n in dice:
+	for n in finalRoll:
 		if n == number:
 			counter = counter + 1
 	score = counter * number
@@ -84,31 +89,31 @@ def choosePoints():
 	        	allKeysTaken.append(key)
 	        	return;
 	    option = input("You probably mistyped something. Try again.\n")
-    
+
 def checkFullHouse():
-	for num in dice:
-		if dice.count(num) == 3:
-			for second_num in dice:
-				if dice.count(second_num) == 2:
+	for num in finalRoll:
+		if finalRoll.count(num) == 3:
+			for second_num in finalRoll:
+				if finalRoll.count(second_num) == 2:
 					return 25
 	return 0
 
 def ofAKind(numOfKind):
-	for number in dice:
-		if dice.count(number) == numOfKind:
+	for number in finalRoll:
+		if finalRoll.count(number) == numOfKind:
 			if numOfKind == 5:
 				return 50
 			else:
 				return numOfKind * number
 	return 0
 def checkStraight(smallOrLarge):
-	sortedArray = list(set(dice))
+	sortedArray = list(set(finalRoll))
 	if smallOrLarge == 1: #large
 		if [1,2,3,4,5] == sortedArray or [2,3,4,5,6] == sortedArray:
-			return sum(dice)
+			return sum(finalRoll)
 	else: #type = 0, small 
 		if all(x in sortedArray for x in [1,2,3,4]) or all(x in sortedArray for x in [2,3,4,5]) or all(x in sortedArray for x in [3,4,5,6]):
-			return sum(dice)
+			return sum(finalRoll)
 	return 0
 
 def removeTakenOptions():
@@ -137,7 +142,7 @@ def removeTakenOptions():
 #Main method
 for turns in range(10):
 	print("Turn %s started.\n" %(turns + 1))
-	dice = roll()
+	roll()
 	allValues = {    "Ones          " : countDice(1),
                      "Twos          " : countDice(2),
                      "Threes        " : countDice(3),
@@ -150,7 +155,7 @@ for turns in range(10):
                      "Small Straight" : checkStraight(0),
                      "Large Straight" : checkStraight(1),
                      "Yahtzee       " : ofAKind(5),
-                     "Chance        " : sum(dice),
+                     "Chance        " : sum(finalRoll),
                      "Pass          " : 0}
 	removeTakenOptions()
 	choosePoints()

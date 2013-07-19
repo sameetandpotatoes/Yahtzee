@@ -21,7 +21,7 @@ def roll():
 	    while times != 2:
 	        if times != 0:
 	            print("Your current dice are:", finalRoll)
-	            result = input("Do you want to keep these dice (y or n) (default answer is n)? ")
+	            result = input("Do you want to keep these dice (y or n) (default answer is y)? ")
 	            result = (result.lower()).strip()
 	            if result != "y":
 	            	break;
@@ -38,9 +38,13 @@ def roll():
 	        		indexesused.append(index)
 	        except IndexError:
 	            print("\nYou only have 5 finalRoll!\n")
+	            keeping = []
+	            indexesused = []
 	            continue
 	        except:
 	            print("\nYou probably mistyped something. Remember: don't include spaces!\n")
+	            keeping = []
+	            indexesused = []
 	            continue
 	        if len(keeping) == 0:
 	            print("Not keeping anything. Rerolling all dice ...")
@@ -121,16 +125,17 @@ def removeTakenOptions():
 	#Gather all zeros first
 	for key, value in allValues.items():
 		value =  int(value)
-		if value == 0 and "Pass" not in key:
-			keysToPop.append(key)
+		if "Pass          " not in key:
+			if value == 0:
+				keysToPop.append(key)
 	#Gather already taken choices
 	global allKeysTaken
 	for key in allKeysTaken:
 		for keys, values in list(allValues.items()):
 			values = int(values)
-			print("or here")
-			if key is keys:
-				keysToPop.append(key)
+			if "Pass          " not in key:
+				if key is keys:
+					keysToPop.append(key)
 	#Remove everything gathered
 	try:
 		for key in keysToPop:
@@ -140,6 +145,12 @@ def removeTakenOptions():
 		pass
 
 #Main method
+try:
+	inFile = open("highscores.dat", "rb")
+	highScore = pickle.load(inFile)
+	print("Your high score was: " + str(highScore) + ". Try to beat it!")
+except EOFError:
+	pass
 for turns in range(10):
 	print("Turn %s started.\n" %(turns + 1))
 	roll()
@@ -162,6 +173,14 @@ for turns in range(10):
 	print("\nTurn", turns + 1, "completed.")
 
 print("Game Over! Your score was: " + str(scoreOfPlayer))
+outFile = open("highscores.dat", "wb")
+try:
+	if scoreOfPlayer > highScore:
+		highScore = scoreOfPlayer
+	pickles.dump(highScore, outFile)
+except NameError: #This means it was the first time this game has been played
+	pickle.dump(scoreOfPlayer, outFile) 
 
+outFile.close()
 
 

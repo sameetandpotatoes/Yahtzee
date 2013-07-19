@@ -1,6 +1,22 @@
 import random #to generate random finalRoll
 import pickle #to save high score
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
+    def disable(self):
+        self.HEADER = ''
+        self.OKBLUE = ''
+        self.OKGREEN = ''
+        self.WARNING = ''
+        self.FAIL = ''
+        self.ENDC = ''
+
 scoreOfPlayer = 0 #global variable to keep track of score
 finalRoll = []
 allKeysTaken = [] #so players can select an option only once
@@ -11,45 +27,45 @@ def roll():
 	keeping = []
 	indexesused = []
 	times = 0
-	print("Your first roll was:", finalRoll, "\n")
-	result = input("Are you going to keep all or replace some? (k or r) ")
+	print(bcolors.HEADER + "Your first roll was:", finalRoll, "\n")
+	result = input("Are you going to keep all or replace some? (k or r) " + bcolors.ENDC)
 	result = (result.lower()).strip()
 	while result not in ("k", "r"):
-		result = input("\nYou probably mistyped something. Try again. ")
+		result = input(bcolors.FAIL + "\nYou probably mistyped something. Try again. " + bcolors.ENDC)
 		result = (result.lower().strip())     
 	if result == "r":
 	    while times != 2:
 	        if times != 0:
-	            print("Your current dice are:", finalRoll)
-	            result = input("Do you want to keep these dice (y or n) (default answer is y)? ")
+	            print("Your current dice are:", finalRoll, "\n")
+	            result = input(bcolors.HEADER + "Do you want to keep these dice (y or n) (default answer is y)? " + bcolors.ENDC)
 	            result = (result.lower()).strip()
-	            if result != "y":
+	            if result == "y":
 	            	break;
-	        indexes = input("Type the numbers of what you want to keep. (no spaces)")
+	        indexes = input(bcolors.HEADER + "Type the numbers of what you want to keep. (no spaces)" + bcolors.ENDC)
 	        try:
 	        	indexesList = list(indexes)
 	        	for index in indexesList:
 	        		index = int(index)
 	        		while index in indexesused:
-	        			print("Sorry, you are already replacing " + str(finalRoll[index - 1]) + ".\n")
-	        			index = input("Try another index. ")
+	        			print(bcolors.FAIL + "Sorry, you are already replacing " + str(finalRoll[index - 1]) + ".\n")
+	        			index = input("Try another index. " + bcolors.ENDC)
 	        			index = int(index)
 	        		keeping.append(finalRoll[index - 1])
 	        		indexesused.append(index)
 	        except IndexError:
-	            print("\nYou only have 5 finalRoll!\n")
+	            print(bcolors.FAIL + "\nYou only have 5 finalRoll!\n" + bcolors.ENDC)
 	            keeping = []
 	            indexesused = []
 	            continue
 	        except:
-	            print("\nYou probably mistyped something. Remember: don't include spaces!\n")
+	            print(bcolors.FAIL + "\nYou probably mistyped something. Remember: don't include spaces!\n" + bcolors.ENDC)
 	            keeping = []
 	            indexesused = []
 	            continue
 	        if len(keeping) == 0:
-	            print("Not keeping anything. Rerolling all dice ...")
+	            print(bcolors.OKGREEN + "Not keeping anything. Rerolling all dice ..." + bcolors.ENDC)
 	        else:
-	            print("Keeping", keeping, "and rolling the others ...")
+	            print(bcolors.OKBLUE + "Keeping", keeping, "and rolling the others ..." + bcolors.ENDC)
 	        newfinalRollarray = rolldie(5-len(keeping))
 	        for newfinalRoll in newfinalRollarray:
 	            keeping.append(newfinalRoll)
@@ -58,7 +74,7 @@ def roll():
 	        keeping = []
 	        indexesused = []
 	        times += 1
-	print("Your roll was: %s\n" %(finalRoll))
+	print(bcolors.OKGREEN + "Your roll was: %s\n" %(finalRoll) + bcolors.ENDC)
 
 def rolldie(numToRoll):
     diechoices = ['1', '2', '3', '4', '5', '6']
@@ -82,17 +98,17 @@ def choosePoints():
         print(key + ":\t" + value + " points.")
     global scoreOfPlayer
     global allKeysTaken
-    option = input("\nHere are all of your options to pick from. Choose which one you would like by entering the name of the option.\n")
+    option = input(bcolors.HEADER + "\nHere are all of your options to pick from. Choose which one you would like by entering the name of the option.\n" + bcolors.ENDC)
     while True:
 	    for key, value in allValues.items():
 	        keycopy = (key.strip(" ")).lower()
 	        option = (option.strip()).lower()
 	        if keycopy == option:
 	        	scoreOfPlayer = scoreOfPlayer + int(value)
-	        	print("\nPlayer Score: %s\n" %(scoreOfPlayer))
+	        	print(bcolors.OKBLUE + "\nPlayer Score: %s\n" %(scoreOfPlayer) + bcolors.ENDC)
 	        	allKeysTaken.append(key)
 	        	return;
-	    option = input("You probably mistyped something. Try again.\n")
+	    option = input(bcolors.FAIL + "You probably mistyped something. Try again.\n" + bcolors.ENDC)
 
 def checkFullHouse():
 	for num in finalRoll:
@@ -152,7 +168,7 @@ try:
 except EOFError:
 	pass
 for turns in range(10):
-	print("Turn %s started.\n" %(turns + 1))
+	print(bcolors.HEADER+ "Turn %s started.\n" %(turns + 1) + bcolors.ENDC)
 	roll()
 	allValues = {    "Ones          " : countDice(1),
                      "Twos          " : countDice(2),
@@ -170,9 +186,9 @@ for turns in range(10):
                      "Pass          " : 0}
 	removeTakenOptions()
 	choosePoints()
-	print("\nTurn", turns + 1, "completed.")
+	print(bcolors.HEADER + "\nTurn", turns + 1, "completed." + bcolors.ENDC)
 
-print("Game Over! Your score was: " + str(scoreOfPlayer))
+print(bcolors.HEADER + "Game Over! Your score was: " + str(scoreOfPlayer) + bcolors.ENDC)
 outFile = open("highscores.dat", "wb")
 try:
 	if scoreOfPlayer > highScore:

@@ -20,7 +20,7 @@ class bcolors:
 
 scoreOfPlayer = 0 #global variable to keep track of score
 finalRoll = []
-allKeysTaken = [] #so players can select an option only once
+allKeysandValues = {} #so players select an option only once
 #This method rolls finalRoll and keeps track of which finalRoll players want to keep
 def roll():
 	global finalRoll
@@ -64,7 +64,7 @@ def roll():
 	            indexesused = []
 	            continue
 	        if len(replacing) == 0:
-	            print(bcolors.OKGREEN + "Not replacing anything. Rerolling all dice ..." + bcolors.ENDC)
+	            print(bcolors.OKGREEN + "Not replacing anything. Keeping all dice ..." + bcolors.ENDC)
 	        else:
 	        	numReplacing =[]
 	        	for index in replacing:
@@ -82,7 +82,7 @@ def roll():
 	        replacing = []
 	        indexesused = []
 	        times += 1
-	print(bcolors.OKGREEN + "Your roll was: %s\n" %(finalRoll) + bcolors.ENDC)
+	print(bcolors.OKGREEN + "\nYour roll was: %s\n" %(finalRoll) + bcolors.ENDC)
 
 def rolldie(numToRoll):
     diechoices = ['1', '2', '3', '4', '5', '6']
@@ -100,21 +100,21 @@ def countDice(number):
 	return score
 
 def choosePoints():
-    for key, value in list(allValues.items()):
-        key = str(key)
-        value = str(value)
-        print(key + ":\t" + value + " points.")
-    global scoreOfPlayer
-    global allKeysTaken
-    option = input(bcolors.HEADER + "\nHere are all of your options to pick from. Choose which one you would like by entering the name of the option.\n" + bcolors.ENDC)
-    while True:
-	    for key, value in allValues.items():
-	        keycopy = (key.strip(" ")).lower()
+	key = allValues[0]
+	value = allValues[1]
+	for index in range(0, len(key)):
+		print(str(key[index]) + ":\t" + str(value[index]) + " points.")
+	global scoreOfPlayer
+	global allKeysTaken
+	option = input(bcolors.HEADER + "\nHere are all of your options to pick from. Choose which one you would like by entering the name of the option.\n" + bcolors.ENDC)
+	while True:
+	    for index in range(0, len(key)):
+	        keycopy = (key[index].strip(" ")).lower()
 	        option = (option.strip()).lower()
 	        if keycopy == option:
-	        	scoreOfPlayer = scoreOfPlayer + int(value)
+	        	scoreOfPlayer = scoreOfPlayer + int(value[index])
 	        	print(bcolors.OKBLUE + "\nPlayer Score: %s\n" %(scoreOfPlayer) + bcolors.ENDC)
-	        	allKeysTaken.append(key)
+	        	allKeysandValues[key[index]] = int(value[index])
 	        	return;
 	    option = input(bcolors.FAIL + "You probably mistyped something. Try again.\n" + bcolors.ENDC)
 
@@ -129,7 +129,7 @@ def checkFullHouse():
 def ofAKind(numOfKind):
 	for number in finalRoll:
 		if finalRoll.count(number) == numOfKind:
-			if numOfKind == 5:
+			if numOfKind == 5: #Yahtzee
 				return 50
 			else:
 				return numOfKind * number
@@ -138,37 +138,64 @@ def checkStraight(smallOrLarge):
 	sortedArray = list(set(finalRoll))
 	if smallOrLarge == 1: #large
 		if [1,2,3,4,5] == sortedArray or [2,3,4,5,6] == sortedArray:
-			return sum(finalRoll)
+			return 40
 	else: #type = 0, small 
 		if all(x in sortedArray for x in [1,2,3,4]) or all(x in sortedArray for x in [2,3,4,5]) or all(x in sortedArray for x in [3,4,5,6]):
-			return sum(finalRoll)
+			return 30
 	return 0
 
 def removeTakenOptions():
-	keysToPop = []
 	#Gather all zeros first
-	for key, value in allValues.items():
-		value =  int(value)
-		if "Pass          " not in key:
-			if value == 0:
-				keysToPop.append(key)
+	key = allValues[0]
+	value = allValues[1]
+	#indexesToDelete = []
+	index = len(key) - 1
+	while index >= 0:
+		if "Pass          " not in key[index]:
+			int(value[index])
+			if value[index] == 0:
+				del key[index]
+				del value[index]
+		index -= 1
 	#Gather already taken choices
-	global allKeysTaken
-	for key in allKeysTaken:
-		for keys, values in list(allValues.items()):
-			values = int(values)
-			if "Pass          " not in key:
-				if key is keys:
-					keysToPop.append(key)
-	#Remove everything gathered
-	try:
-		for key in keysToPop:
-			if key in allValues.keys():
-				allValues.pop(key)
-	except KeyError:
-		pass
+	global allKeysandValues
+	for takenKey in allKeysandValues.keys():
+		index = len(key) - 1
+		while index >= 0:
+			if "Pass          " not in takenKey:
+				if takenKey is key[index]:
+					del key[index]
+					del value[index]
+			index -= 1
 
-#Main method
+def over63():
+	sumOfFirstSix = 0
+	arrayToCheck = ["Ones", "Twos", "Threes", "Fours", "Fives", "Sixes"]
+	i = 0
+	for key, value in allKeysandValues.items():
+		if key.strip(" ") == arrayToCheck[i]:
+			sumOfFirstSix += int(value)
+			i += 1
+		else:
+			return False
+		if i == len(arrayToCheck):
+			break;
+	return (sumOfFirstSix >= 63)
+def printCurrentScoreCard(allOptions):
+	print(bcolors.HEADER + "Yahtzee Score Card" + bcolors.ENDC)
+	for key in allOptions:
+		if key == "Over 63 = +35 ":
+			print(bcolors.OKBLUE + key + "|\t" + bcolors.ENDC, end = "\n")
+		elif key != "Pass          ":
+			print(bcolors.OKBLUE + key + "|\t" + bcolors.ENDC, end="")
+		for k, v in allKeysandValues.items():
+			if k == key and k != "Pass          ": #already taken
+				print(bcolors.OKGREEN + str(v), end = "")
+				if over63():
+					scoreOfPlayer += 35
+		print()
+
+#Where the program starts
 try:
 	inFile = open("highscores.dat", "rb")
 	highScore = pickle.load(inFile)
@@ -178,27 +205,28 @@ except EOFError:
 for turns in range(10):
 	print(bcolors.HEADER+ "Turn %s started.\n" %(turns + 1) + bcolors.ENDC)
 	roll()
-	allValues = {    "Ones          " : countDice(1),
-                     "Twos          " : countDice(2),
-                     "Threes        " : countDice(3),
-                     "Fours         " : countDice(4),
-                     "Fives         " : countDice(5),
-                     "Sixes         " : countDice(6),
-                     "3 of a kind   " : ofAKind(3),
-                     "4 of a kind   " : ofAKind(4),
-                     "Full House    " : checkFullHouse(),
-                     "Small Straight" : checkStraight(0),
-                     "Large Straight" : checkStraight(1),
-                     "Yahtzee       " : ofAKind(5),
-                     "Chance        " : sum(finalRoll),
-                     "Pass          " : 0}
+
+	allValues = [   ["Ones          ", "Twos          ", "Threes        ",
+					 "Fours         ", "Fives         ", "Sixes         ",
+					 "Over 63 = +35 ",
+					 "3 of a kind   ", "4 of a kind   ", "Full House    ",
+					 "Small Straight", "Large Straight", "Yahtzee       ",
+					 "Chance        ", "Pass          "],
+					[countDice(1), countDice(2), countDice(3),
+					 countDice(4), countDice(5), countDice(6), 0,
+					 ofAKind(3), ofAKind(4), checkFullHouse(),
+					 checkStraight(0), checkStraight(1), ofAKind(5),
+					 sum(finalRoll), 0]]
+	allKeys = allValues[0].copy()
 	removeTakenOptions()
 	choosePoints()
-	
-	time.sleep(1) #Sleep for one second
+	time.sleep(0.5) #Sleep for one second
 	os.system('cls' if os.name=='nt' else 'clear') #Will work on both Unix and Windows
 	print(bcolors.HEADER + "\nTurn", turns + 1, "completed." + bcolors.ENDC)
+	print("Here is your current Score Card:\n\n")
+	printCurrentScoreCard(allKeys)
 
+#End of game	
 print(bcolors.HEADER + "Game Over! Your score was: " + str(scoreOfPlayer) + bcolors.ENDC)
 outFile = open("highscores.dat", "wb")
 try:
@@ -207,7 +235,6 @@ try:
 	pickles.dump(highScore, outFile)
 except NameError: #This means it was the first time this game has been played
 	pickle.dump(scoreOfPlayer, outFile) 
-
 outFile.close()
 
 

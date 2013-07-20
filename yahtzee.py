@@ -231,7 +231,7 @@ for turns in range(10):
 					 "3 of a kind   ", "4 of a kind   ", "Full House    ",
 					 "Small Straight", "Large Straight", "Yahtzee       ",
 					 "Chance        ", "Pass          "],
-					[50, countDice(2), countDice(3),
+					[countDice(1), countDice(2), countDice(3),
 					 countDice(4), countDice(5), countDice(6), 0,
 					 ofAKind(3), ofAKind(4), checkFullHouse(),
 					 checkStraight(0), checkStraight(1), ofAKind(5),

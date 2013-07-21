@@ -99,10 +99,15 @@ def countDice(number):
 def choosePoints():
 	key = allValues[0]
 	value = allValues[1]
+	bestOption = max(value)
 	counter = 1;
 	for index in range(0, len(key)):
-		print(str(counter) + ":\t", end="")
-		print(str(key[index]) + ":\t" + str(value[index]) + " points.")
+		if value[index] == bestOption:
+			print('\033[1m'+ str(counter) + ":\t", end="")
+			print(str(key[index]) + ":\t" + str(value[index]) + " points" + '\033[0m')
+		else:
+			print(str(counter) + ":\t", end="")
+			print(str(key[index]) + ":\t" + str(value[index]) + " points.")
 		counter += 1
 	global scoreOfPlayer
 	global allKeysTaken

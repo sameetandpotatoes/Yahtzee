@@ -1,7 +1,8 @@
-import random #to generate random finalRoll
+import random #to generate random dice
 import pickle #to save high score
 import os #to help clear the screen
 import time
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -10,14 +11,7 @@ class bcolors:
     FAIL = '\033[91m'
     ENDC = '\033[0m'
 
-    def disable(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
-
+turnNumber = 0
 scoreOfPlayer = 0 #global variable to keep track of score
 finalRoll = []
 allKeysandValues = {}
@@ -31,12 +25,12 @@ def roll():
 	indexesused = []
 	times = 0
 	print(bcolors.HEADER + "Your first roll was:", finalRoll, "\n")
-	result = input("Are you going to keep all or replace some? (k or r) " + bcolors.ENDC)
+	result = input("Do you want to keep these dice? (y or n) " + bcolors.ENDC)
 	result = (result.lower()).strip()
-	while result not in ("k", "r"):
+	while result not in ("y", "n"):
 		result = input(bcolors.FAIL + "\nYou probably mistyped something. Try again. " + bcolors.ENDC)
 		result = (result.lower().strip())     
-	if result == "r":
+	if result == "n":
 	    while times != 2:
 	        if times != 0:
 	            print("Your current dice are:", finalRoll, "\n")
@@ -105,22 +99,28 @@ def countDice(number):
 def choosePoints():
 	key = allValues[0]
 	value = allValues[1]
+	counter = 1;
 	for index in range(0, len(key)):
+		print(str(counter) + ":\t", end="")
 		print(str(key[index]) + ":\t" + str(value[index]) + " points.")
+		counter += 1
 	global scoreOfPlayer
 	global allKeysTaken
-	option = input(bcolors.HEADER + "\nHere are all of your options to pick from. Choose which one you would like by entering the name of the option.\n" + bcolors.ENDC)
+	option = input(bcolors.HEADER + "\nHere are all of your options to pick from. Choose which one you would like by entering the name or number of the option.\n" + bcolors.ENDC)
 	while True:
-	    for index in range(0, len(key)):
-	        keycopy = (key[index].strip(" ")).lower()
-	        option = (option.strip()).lower()
-	        if keycopy == option:
-	        	scoreOfPlayer = scoreOfPlayer + int(value[index])
-	        	print(bcolors.OKBLUE + "\nPlayer Score: %s\n" %(scoreOfPlayer) + bcolors.ENDC)
-	        	allKeysandValues[key[index]] = int(value[index])
-	        	return;
-	    option = input(bcolors.FAIL + "You probably mistyped something. Try again.\n" + bcolors.ENDC)
-
+		try:
+			option = key[int(option) - 1]
+		except:
+			pass
+		for index in range(0, len(key)):
+			keycopy = (key[index].strip(" ")).lower()
+			option = (option.strip()).lower()
+			if keycopy == option:
+				scoreOfPlayer = scoreOfPlayer + int(value[index])
+				allKeysandValues[key[index]] = int(value[index])
+				return;
+		option = input(bcolors.FAIL + "You probably mistyped something. Try again.\n" + bcolors.ENDC)
+	    
 def checkFullHouse():
 	for num in finalRoll:
 		if finalRoll.count(num) == 3:
@@ -175,7 +175,6 @@ def removeTakenOptions():
 					del key[index]
 					del value[index]
 			index -= 1
-
 def over63():
 	global bonusReceived
 	if bonusReceived:
@@ -221,8 +220,8 @@ try:
 	print("Your high score was: " + str(highScore) + ". Try to beat it!")
 except EOFError:
 	pass
-for turns in range(10):
-	print(bcolors.HEADER+ "Turn %s started.\n" %(turns + 1) + bcolors.ENDC)
+for turnNumber in range(13):
+	print(bcolors.HEADER+ "Turn %s started.\n" %(turnNumber + 1) + bcolors.ENDC)
 	roll()
 
 	allValues = [   ["Ones          ", "Twos          ", "Threes        ",
@@ -241,7 +240,7 @@ for turns in range(10):
 	choosePoints()
 	time.sleep(0.5) #Sleep for one second
 	os.system('cls' if os.name=='nt' else 'clear') #Will work on both Unix and Windows
-	print(bcolors.HEADER + "\nTurn", turns + 1, "completed." + bcolors.ENDC)
+	print(bcolors.HEADER + "\nTurn", turnNumber + 1, "completed." + bcolors.ENDC)
 	print("Here is your current Score Card:\n\n")
 	printCurrentScoreCard(allKeys)
 

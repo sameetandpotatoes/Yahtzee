@@ -34,7 +34,7 @@ def roll():
 	    while times != 2:
 	        if times != 0:
 	            print("Your current dice are:", finalRoll, "\n")
-	            result = input(bcolors.HEADER + "Do you want to keep these dice (y or n) (default answer is y)? " + bcolors.ENDC)
+	            result = input(bcolors.HEADER + "Do you want to keep these dice (y or n) (default answer is n)? " + bcolors.ENDC)
 	            result = (result.lower()).strip()
 	            if result == "y":
 	            	break;

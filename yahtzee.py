@@ -49,13 +49,15 @@ def roll():
 	        			index = int(index)
 	        		replacing.append(index - 1)
 	        		indexesused.append(index)
+	        		#The following line makes sure that the index called was okay
+	        		finalRoll[index - 1]
 	        except IndexError:
-	            print(bcolors.FAIL + "\nYou only have 5 finalRoll!\n" + bcolors.ENDC)
+	            print(bcolors.FAIL + "\nYou only have 5 dice!\n" + bcolors.ENDC)
 	            replacing = []
 	            indexesused = []
 	            continue
 	        except:
-	            print(bcolors.FAIL + "\nYou probably mistyped something. Remember: don't include spaces!\n" + bcolors.ENDC)
+	            print(bcolors.FAIL + "\nYou probably mistyped something. Try again.\n" + bcolors.ENDC)
 	            replacing = []
 	            indexesused = []
 	            continue
@@ -66,7 +68,9 @@ def roll():
 	        	numReplacing =[]
 	        	for index in replacing:
 	        		numReplacing.append(finalRoll[index])
-	        	print(bcolors.OKBLUE + "Replacing", numReplacing , "and rolling the others ..." + bcolors.ENDC)
+	        	if len(replacing) == 5:
+	        		numReplacing = "everything"
+	        	print(bcolors.OKBLUE + "Replacing", numReplacing , "" + bcolors.ENDC)
 	        keeping = []
 	        for index in (set([0,1,2,3,4]) - set(replacing)):
 	        	keeping.append(finalRoll[index])

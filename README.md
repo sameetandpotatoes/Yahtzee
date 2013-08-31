@@ -22,3 +22,5 @@
 - `cd Yahtzee`
 - `python3 yahtzee.py`
 
+
+[![endorse](https://api.coderwall.com/sameetandpotatoes/endorsecount.png)](https://coderwall.com/sameetandpotatoes)

@@ -2,14 +2,16 @@ import random #to generate random dice
 import pickle #to save high score
 import os #to help clear the screen
 import time
+from colorama import *
+init(autoreset=True)
 
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
+    HEADER = Fore.MAGENTA
+    OKBLUE = Fore.BLUE
+    OKGREEN = Fore.GREEN
+    WARNING = Fore.BLACK
+    FAIL = Fore.RED
+    ENDC = Fore.RESET
 
 turnNumber = 0
 scoreOfPlayer = 0 #global variable to keep track of score
@@ -24,16 +26,16 @@ def roll():
 	replacing = []
 	indexesused = []
 	times = 0
-	print(bcolors.HEADER + "Your first roll was:", finalRoll, "\n")
-	result = input("Do you want to keep these dice? (y or n) " + bcolors.ENDC)
+	print(bcolors.OKGREEN + "Your first roll was:", finalRoll, "\n")
+	result = input(bcolors.HEADER + "Do you want to keep these dice? (y or n) " + bcolors.ENDC)
 	result = (result.lower()).strip()
 	while result not in ("y", "n"):
 		result = input(bcolors.FAIL + "\nYou probably mistyped something. Try again. " + bcolors.ENDC)
-		result = (result.lower().strip())     
+		result = (result.lower().strip())
 	if result == "n":
 	    while times != 2:
 	        if times != 0:
-	            print("Your current dice are:", finalRoll, "\n")
+	            print(bcolors.OKGREEN + "Your current dice are:", finalRoll, "\n")
 	            result = input(bcolors.HEADER + "Do you want to keep these dice (y or n) (default answer is n)? " + bcolors.ENDC)
 	            result = (result.lower()).strip()
 	            if result == "y":
@@ -45,7 +47,7 @@ def roll():
 	        		index = int(index)
 	        		while index in indexesused:
 	        			print(bcolors.FAIL + "Sorry, you are already replacing " + str(finalRoll[index - 1]) + ".\n")
-	        			index = input("Try another index. " + bcolors.ENDC)
+	        			index = input(bcolors.FAIL + "Try another index. " + bcolors.ENDC)
 	        			index = int(index)
 	        		replacing.append(index - 1)
 	        		indexesused.append(index)
@@ -74,11 +76,11 @@ def roll():
 	        keeping = []
 	        for index in (set([0,1,2,3,4]) - set(replacing)):
 	        	keeping.append(finalRoll[index])
-	        
+
 	        newfinalRollarray = rolldie(len(replacing))
 	        for newfinalRoll in newfinalRollarray:
 	            keeping.append(newfinalRoll)
-	        
+
 	        finalRoll = keeping
 	        replacing = []
 	        indexesused = []
@@ -129,7 +131,7 @@ def choosePoints():
 				allKeysandValues[key[index]] = int(value[index])
 				return;
 		option = input(bcolors.FAIL + "You probably mistyped something. Try again.\n" + bcolors.ENDC)
-	    
+
 def checkFullHouse():
 	for num in finalRoll:
 		if finalRoll.count(num) == 3:
@@ -156,7 +158,7 @@ def checkStraight(smallOrLarge):
 	if smallOrLarge == 1: #large
 		if [1,2,3,4,5] == sortedArray or [2,3,4,5,6] == sortedArray:
 			return 40
-	else: #type = 0, small 
+	else: #type = 0, small
 		if all(x in sortedArray for x in [1,2,3,4]) or all(x in sortedArray for x in [2,3,4,5]) or all(x in sortedArray for x in [3,4,5,6]):
 			return 30
 	return 0
@@ -226,7 +228,7 @@ def printCurrentScoreCard(allOptions):
 try:
 	inFile = open("highscores.dat", "rb")
 	highScore = pickle.load(inFile)
-	print("Your high score was: " + str(highScore) + ". Try to beat it!")
+	print(bcolors.HEADER + "Your high score was: " + str(highScore) + ". Try to beat it!")
 except EOFError:
 	pass
 for turnNumber in range(13):
@@ -250,10 +252,10 @@ for turnNumber in range(13):
 	time.sleep(0.5) #Sleep for one second
 	os.system('cls' if os.name=='nt' else 'clear') #Will work on both Unix and Windows
 	print(bcolors.HEADER + "\nTurn", turnNumber + 1, "completed." + bcolors.ENDC)
-	print("Here is your current Score Card:\n\n")
+	print(bcolors.OKGREEN + "Here is your current Score Card:\n\n" + bcolors.ENDC)
 	printCurrentScoreCard(allKeys)
 
-#End of game	
+#End of game
 print(bcolors.HEADER + "Game Over! Your score was: " + str(scoreOfPlayer) + bcolors.ENDC)
 outFile = open("highscores.dat", "wb")
 try:
@@ -261,7 +263,7 @@ try:
 		highScore = scoreOfPlayer
 	pickles.dump(highScore, outFile)
 except NameError: #This means it was the first time this game has been played
-	pickle.dump(scoreOfPlayer, outFile) 
+	pickle.dump(scoreOfPlayer, outFile)
 outFile.close()
 
 

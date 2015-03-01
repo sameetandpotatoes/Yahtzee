@@ -8,7 +8,7 @@
 - All rules in Yahtzee are included
 
 # Screenshots
-![Screenshot](https://copy.com/oHUF9heZP1q3uFD0)
+![Screenshot](https://copy.com/Z6FWz7sXu6x2wew0)
 ![Screenshot](https://copy.com/WjSnm8ylWie217iK)
 ![Screenshot](https://copy.com/RC0xE4jaucOW8Rpj)
 
